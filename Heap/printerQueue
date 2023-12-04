@@ -1,0 +1,92 @@
+class PrinterQueue
+{
+public:
+    pair<int,string>* queue;
+    int count;
+    int capicity;
+    // your attributes
+public:
+    // your methods
+    PrinterQueue(){
+        this->count = 0;
+        this->capicity = 10;
+        this->queue = new pair<int,string>[this->capicity];
+    }
+    ~PrinterQueue(){
+        delete[] queue;
+    }
+    void ensureCapacity(int minCapacity){
+        pair<int,string>* newQueue = new pair<int,string>[minCapacity];
+        for (int i = 0; i < this->count; ++i) {
+            newQueue[i] = this->queue[i];
+        }
+        delete[] this->queue;
+        this->queue = newQueue;
+        this->capicity = minCapacity;
+    }
+
+    void reheapUp(int position){
+        if(position<=0) return;
+        int index = (position-1)/2;
+        if(queue[position].first > queue[index].first){
+            pair<int,string> temp = queue[index];
+            queue[index]= queue[position];
+            queue[position] = temp;
+            reheapUp(index);
+    }
+    }
+    void addNewRequest(int priority, string fileName)
+    {
+        // your code here
+        if(this->count == this->capicity) this->ensureCapacity(this->capicity*2);
+        int newPriority = priority*1000+ 100-this->count;
+        pair<int,string> temp;
+        temp.first = newPriority;
+        temp.second = fileName;
+        queue[this->count] = temp;
+        reheapUp(this->count);
+        this->count++;
+    }
+    void reheapDown(pair<int,string> maxHeap[], int numberOfElements, int index)
+{
+        if(index > (numberOfElements)/2 || index<0)   return;
+        int i= index;
+        int largest_e=0;
+        if((2*i + 1) < numberOfElements){
+            int left_e= 2*i +1;        
+            if((2*i +2) < numberOfElements){
+                int right_e= 2*i +2;
+                if(maxHeap[left_e].first > maxHeap[right_e].first)  largest_e= left_e;
+                else    largest_e= right_e;
+            }
+            else    largest_e= left_e;
+        }
+        else    return;
+        if(maxHeap[i].first < maxHeap[largest_e].first){
+            swap(maxHeap[i], maxHeap[largest_e]);
+            reheapDown(maxHeap, numberOfElements, largest_e);
+        }
+    return;
+}
+
+    void print()
+    {
+        // your code here
+        // After some logic code, you have to print fileName with endline 
+        if(this->count == 0){
+            cout<<"No file to print"<<endl;
+            return;
+        }
+        if(this->count==1){
+        this->count = 0;
+        cout<<queue[0].second<<endl;
+        return;
+        }
+        cout<<queue[0].second<<endl;
+        queue[0] = queue[this->count-1];
+        this->count--;
+        this->reheapDown(queue,this->count,0);
+        return;
+        
+    }
+};
